@@ -1,0 +1,11 @@
+# Store this file at the root of your local repository.
+.DS_Store
+Library
+Temp
+Build
+Builds
+*.csproj
+*.pidb
+*.sln
+*.userprefs
+*.unityproj
