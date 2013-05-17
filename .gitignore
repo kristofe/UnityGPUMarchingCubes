@@ -9,3 +9,5 @@ Builds
 *.sln
 *.userprefs
 *.unityproj
+*.cache
+*.suo
