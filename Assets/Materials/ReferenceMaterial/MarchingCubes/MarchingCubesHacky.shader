@@ -497,7 +497,7 @@ Shader "Custom/GSMarchingCubes"
 				// Fragment Shader -----------------------------------------------
 				float4 FS_Main(FS_INPUT input) : COLOR
 				{
-					float dataStepSize = 16.0;
+					float dataStepSize = 32.0;
 					float h2 = dataStepSize*2.0;
 					float3 position = input.tex3D;
 					float3 dataStep = float3(1.0/dataStepSize,1.0/dataStepSize,1.0/dataStepSize);
