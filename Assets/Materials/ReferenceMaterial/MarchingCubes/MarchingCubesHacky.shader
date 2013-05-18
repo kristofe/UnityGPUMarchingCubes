@@ -494,8 +494,6 @@ Shader "Custom/GSMarchingCubes"
 					
 				}
 
-
-
 				// Fragment Shader -----------------------------------------------
 				float4 FS_Main(FS_INPUT input) : COLOR
 				{
