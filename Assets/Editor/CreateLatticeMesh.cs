@@ -3,31 +3,21 @@ using UnityEditor;
 using System.Collections;
 
 public class CreateLatticeMesh : MonoBehaviour {
-    public Mesh m;
-    public float worldSize;
-    public int meshDim;
-    public string meshName = "LatticeMesh";
-    public bool run;
-    public bool overwrite;
 	// Use this for initialization
-	void Start () {
-        if (run)
-        {
-            CreateLattice();
-            saveMesh();
-        }
+    [MenuItem ("Mesh Creation/Create Point Lattice Mesh")]
+	static void CreatePointLatticeMesh () {
+        string meshName = "LatticeMesh1x1x1";
+        Mesh m = CreateLattice(32);
+        saveMesh(m, meshName);
+       
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
 
-    private void saveMesh(){
+    private static void saveMesh(Mesh m, string meshName){
         string path = "Assets/Meshes/" + meshName + ".asset";
         Mesh tmp = (Mesh)AssetDatabase.LoadAssetAtPath(path, typeof(Mesh));
-        if(tmp && overwrite){
+        if(tmp){
             AssetDatabase.DeleteAsset(path);
             tmp = null;
         }
@@ -37,24 +27,22 @@ public class CreateLatticeMesh : MonoBehaviour {
     }
 
 
-    private Mesh CreateLattice()
+    private static Mesh CreateLattice(int meshDim)
     {
-        m = GetComponent<MeshFilter>().mesh;
-        ConstructMesh(m);
+        Mesh m = new Mesh();
+        ConstructMesh(m, meshDim);
         m.RecalculateBounds();
-        MeshFilter mf = (MeshFilter)transform.GetComponent(typeof(MeshFilter));
-        mf.mesh = m;
         return m;
     }
 
-    void ConstructMesh(Mesh m)
+    private static void ConstructMesh(Mesh m, int meshDim)
     {
         int vertexCount = meshDim * meshDim * meshDim;
         Vector3[] vertices = new Vector3[vertexCount];
         //Vector2[] uv = new Vector2[meshDim];
         Vector3[] normals = new Vector3[vertexCount];
         int[] triangles = new int[vertexCount*3];
-        float scale = worldSize / meshDim;
+        float scale = 1.0f / meshDim;
         for (int z = 0; z < meshDim; ++z)
         {
             for (int y = 0; y < meshDim; ++y)
