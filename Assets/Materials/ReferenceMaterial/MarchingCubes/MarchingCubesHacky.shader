@@ -5,7 +5,7 @@ Shader "Custom/GSMarchingCubes"
 		_SpriteTex ("Base (RGB)", 2D) = "white" {}
 		_dataFieldTex ("Data Field Texture", 3D) = "white"{}
 		//_Size ("Size", Range(0, 3)) = 0.5 
-		_isoLevel ("_isoLevel", Range(0.0, 1.0)) = 0.1
+		_isoLevel ("_isoLevel", Range(0.0, 0.5)) = 0.25
 	}
 
 	SubShader 
@@ -23,7 +23,8 @@ Shader "Custom/GSMarchingCubes"
 				#pragma fragment FS_Main
 				#pragma geometry GS_Main
 				#include "UnityCG.cginc"  
-				
+				#include "Lighting.cginc"
+
 				#define F3 1.0/3.0 
 				#define G3 1.0/6.0 
 				
@@ -43,6 +44,7 @@ Shader "Custom/GSMarchingCubes"
 					float4	pos		: POSITION;
 					float2  tex0	: TEXCOORD0;
 					float3  normal  : NORMAL;
+					float3  tex3D   : TEXCOORD1;
 				};
 
 
@@ -75,15 +77,20 @@ Shader "Custom/GSMarchingCubes"
 				}
  				
 
-				float SampleDensity( float4 pPosition  ){
-					float3 sampleLoc = pPosition.xyz - float3(0.5,0.5,0.5);
-					return sqrt(dot(sampleLoc,sampleLoc));
-					//return tex3Dlod(_dataFieldTex,float4(pPosition.xyz,0)).x;	
+				float SampleData( float4 pPosition  ){
+					//float3 sampleLoc = pPosition.xyz - float3(0.5,0.5,0.5);
+					//return sqrt(dot(sampleLoc,sampleLoc));
+					return tex3Dlod(_dataFieldTex,float4(pPosition.xyz,0)).x;	
+				}
+
+				float SampleData3( float3 p){
+					return tex3Dlod(_dataFieldTex,float4(p.xyz,0)).x;	
 				}
 
 				// Geometry Shader -----------------------------------------------------
 				[maxvertexcount(15)]
 				void GS_Main(point GS_INPUT p[1], inout TriangleStream<FS_INPUT> triStream)	{
+					/*
 					const float size = 1.0/32.0;
 	 				const float4 cubeVerts[8] = {
 						//front face
@@ -97,8 +104,8 @@ Shader "Custom/GSMarchingCubes"
 						float4( size,  size,  size, 0),		// RT  6
 						float4( size, 0,  size, 0)		// RB  7
 					};
+					*/
 
-					/*
 					const float halfSize = 1.0/64.0;
 	 				const float4 cubeVerts[8] = {
 						//front face
@@ -112,16 +119,16 @@ Shader "Custom/GSMarchingCubes"
 						float4( halfSize,  halfSize,  halfSize, 0),		// RT  6
 						float4( halfSize, -halfSize,  halfSize, 0)		// RB  7
 					};
-					*/
+
 					const float weights[8] = {
-						SampleDensity(p[0].pos + cubeVerts[0]),
-						SampleDensity(p[0].pos + cubeVerts[1]),
-						SampleDensity(p[0].pos + cubeVerts[2]),
-						SampleDensity(p[0].pos + cubeVerts[3]),
-						SampleDensity(p[0].pos + cubeVerts[4]),
-						SampleDensity(p[0].pos + cubeVerts[5]),
-						SampleDensity(p[0].pos + cubeVerts[6]),
-						SampleDensity(p[0].pos + cubeVerts[7])
+						SampleData(p[0].pos + cubeVerts[0]),
+						SampleData(p[0].pos + cubeVerts[1]),
+						SampleData(p[0].pos + cubeVerts[2]),
+						SampleData(p[0].pos + cubeVerts[3]),
+						SampleData(p[0].pos + cubeVerts[4]),
+						SampleData(p[0].pos + cubeVerts[5]),
+						SampleData(p[0].pos + cubeVerts[6]),
+						SampleData(p[0].pos + cubeVerts[7])
 					};
 
 					int cubeIndex = 
@@ -432,18 +439,21 @@ Shader "Custom/GSMarchingCubes"
 							int vb = edge_to_verts[vertlistIndices.x].y;
 							float amount = (_isoLevel - weights[va]) / (weights[vb] - weights[va]);
 							float4 worldPos = lerp( p[0].pos + cubeVerts[va],  p[0].pos + cubeVerts[vb], amount);
+							float4 texA = worldPos;
 							float4 pA = mul(vp, worldPos);
 							
 							va = edge_to_verts[vertlistIndices.y].x;
 							vb = edge_to_verts[vertlistIndices.y].y;
 							amount = (_isoLevel - weights[va]) / (weights[vb] - weights[va]);
 							worldPos = lerp( p[0].pos + cubeVerts[va],  p[0].pos + cubeVerts[vb], amount);
+							float4 texB = worldPos;
 							float4 pB = mul(vp, worldPos);
 							
 							va = edge_to_verts[vertlistIndices.z].x;
 							vb = edge_to_verts[vertlistIndices.z].y;
 							amount = (_isoLevel - weights[va]) / (weights[vb] - weights[va]);
 							worldPos = lerp( p[0].pos + cubeVerts[va],  p[0].pos + cubeVerts[vb], amount);
+							float4 texC = worldPos;
 							float4 pC = mul(vp, worldPos);
 
 							float4 r = pA - pC;
@@ -451,20 +461,23 @@ Shader "Custom/GSMarchingCubes"
 							float3 normal = normalize(cross(f,r));
 
 							pIn.pos = pA;
-							pIn.tex0 = float2(1.0f, 0.0f);
-							pIn.normal = normal;
-							triStream.Append(pIn);
-
-							pIn.pos = pB;
+							pIn.tex3D = texA;
 							pIn.tex0 = float2(1.0f, 0.0f);
 							pIn.normal = normal;
 							triStream.Append(pIn);
 							
 							pIn.normal = normal;
 							pIn.pos = pC;
+							pIn.tex3D = texC;
 							pIn.tex0 = float2(1.0f, 0.0f);
 							triStream.Append(pIn);
 
+							pIn.pos = pB;
+							pIn.tex3D = texB;
+							pIn.tex0 = float2(1.0f, 0.0f);
+							pIn.normal = normal;
+							triStream.Append(pIn);
+							
 							triStream.RestartStrip();
 						}else{
 							pIn.pos = float4(0,0,0,0);// + p[0].pos;
@@ -484,7 +497,31 @@ Shader "Custom/GSMarchingCubes"
 				// Fragment Shader -----------------------------------------------
 				float4 FS_Main(FS_INPUT input) : COLOR
 				{
-					return _SpriteTex.Sample(sampler_SpriteTex, input.tex0)  * saturate(0.5 + input.normal.y * 0.5) ;
+					float dataStepSize = 16.0;
+					float h2 = dataStepSize*2.0;
+					float3 position = input.tex3D;
+					float3 dataStep = float3(1.0/dataStepSize,1.0/dataStepSize,1.0/dataStepSize);
+
+					float3 grad = -float3(
+									(SampleData3(position + float3(dataStep.x, 0, 0)).x - SampleData3(position+float3(-dataStep.x, 0, 0)).x)/h2, 
+									(SampleData3(position+float3(0, dataStep.y, 0)).x - SampleData3(position+float3(0, -dataStep.y, 0)).x)/h2, 
+									(SampleData3(position+float3(0,0,dataStep.z)).x - SampleData3(position+float3(0,0,-dataStep.z)).x)/h2
+									);
+
+					/*
+					float3 grad = float3(
+		SampleData3((position.xyz+float3(dataStep.x, 0, 0)+1.0)/2.0).x - SampleData3((position.xyz+float3(-dataStep.x, 0, 0)+1.0)/2.0).x, 
+		SampleData3((position.xyz+float3(0, dataStep.y, 0)+1.0)/2.0).x - SampleData3((position.xyz+float3(0, -dataStep.y, 0)+1.0)/2.0).x, 
+		SampleData3( (position.xyz+float3(0,0,dataStep.z)+1.0)/2.0).x - SampleData3((position.xyz+float3(0,0,-dataStep.z)+1.0)/2.0).x
+					);
+					*/
+    
+					float3 normal = normalize(grad);
+
+					float d = dot(normalize(_WorldSpaceLightPos0.xyz),normal);
+					//return float4(d,d,d,1);
+					return float4(normal,1);
+					//return _SpriteTex.Sample(sampler_SpriteTex, input.tex0)  * saturate(0.5 + normal.y * 0.5) ;
 				}
 
 			ENDCG

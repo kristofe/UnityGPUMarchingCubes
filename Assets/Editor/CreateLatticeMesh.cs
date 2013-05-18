@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CreateLatticeMesh : MonoBehaviour {
 	// Use this for initialization
@@ -41,7 +42,7 @@ public class CreateLatticeMesh : MonoBehaviour {
         Vector3[] vertices = new Vector3[vertexCount];
         //Vector2[] uv = new Vector2[meshDim];
         Vector3[] normals = new Vector3[vertexCount];
-        int[] triangles = new int[vertexCount*3];
+        List<int> triangles = new List<int>(vertexCount * 3);
         float scale = 1.0f / meshDim;
         for (int z = 0; z < meshDim; ++z)
         {
@@ -52,13 +53,15 @@ public class CreateLatticeMesh : MonoBehaviour {
                     int idx = z * meshDim * meshDim + y * meshDim + x;
                     vertices[idx] = new Vector3(x * scale, y * scale, z * scale);
                     normals[idx] = Vector3.right;
-                    triangles[idx] = idx;
+                    triangles.Add(idx);
+                    triangles.Add(idx);
+                    triangles.Add(idx);
                 }
             }
         }
         m.vertices = vertices;
         //m.uv = uv;
         m.normals = normals;
-        m.triangles = triangles; 
+        m.triangles = triangles.ToArray(); 
     }
 }
