@@ -78,12 +78,14 @@ Shader "Custom/GSMarchingCubes"
  				
 
 				float SampleData( float4 pPosition  ){
-					//float3 sampleLoc = pPosition.xyz - float3(0.5,0.5,0.5);
-					//return sqrt(dot(sampleLoc,sampleLoc));
+					//float3 sampleloc = pPosition.xyz - float3(0.5,0.5,0.5);
+					//return sqrt(dot(sampleloc,sampleloc));
 					return tex3Dlod(_dataFieldTex,float4(pPosition.xyz,0)).x;	
 				}
 
 				float SampleData3( float3 p){
+					//float3 sampleloc = p - float3(0.5,0.5,0.5);
+					//return sqrt(dot(sampleloc,sampleloc));
 					return tex3Dlod(_dataFieldTex,float4(p.xyz,0)).x;	
 				}
 
@@ -497,7 +499,7 @@ Shader "Custom/GSMarchingCubes"
 				// Fragment Shader -----------------------------------------------
 				float4 FS_Main(FS_INPUT input) : COLOR
 				{
-					float dataStepSize = 32.0;
+					float dataStepSize = 64.0;
 					float h2 = dataStepSize*2.0;
 					float3 position = input.tex3D;
 					float3 dataStep = float3(1.0/dataStepSize,1.0/dataStepSize,1.0/dataStepSize);
@@ -507,21 +509,18 @@ Shader "Custom/GSMarchingCubes"
 									(SampleData3(position+float3(0, dataStep.y, 0)).x - SampleData3(position+float3(0, -dataStep.y, 0)).x)/h2, 
 									(SampleData3(position+float3(0,0,dataStep.z)).x - SampleData3(position+float3(0,0,-dataStep.z)).x)/h2
 									);
-
-					/*
-					float3 grad = float3(
-		SampleData3((position.xyz+float3(dataStep.x, 0, 0)+1.0)/2.0).x - SampleData3((position.xyz+float3(-dataStep.x, 0, 0)+1.0)/2.0).x, 
-		SampleData3((position.xyz+float3(0, dataStep.y, 0)+1.0)/2.0).x - SampleData3((position.xyz+float3(0, -dataStep.y, 0)+1.0)/2.0).x, 
-		SampleData3( (position.xyz+float3(0,0,dataStep.z)+1.0)/2.0).x - SampleData3((position.xyz+float3(0,0,-dataStep.z)+1.0)/2.0).x
-					);
-					*/
-    
 					float3 normal = normalize(grad);
+					
+					float pi = 3.14159265;
+					float3 dir = normalize(position - float3(0.5,0.5,0.5));
+					float u = (atan2(dir.z,dir.x)+pi)/(2.0 * pi); 
+					float v = 0.5 + 0.5* dot(float3(0,1,0),dir);
 
 					float d = dot(normalize(_WorldSpaceLightPos0.xyz),normal);
 					//return float4(d,d,d,1);
-					return float4(normal,1);
-					//return _SpriteTex.Sample(sampler_SpriteTex, input.tex0)  * saturate(0.5 + normal.y * 0.5) ;
+					//return float4(normal,1);
+					//return _SpriteTex.Sample(sampler_SpriteTex, float2(u,v))  * saturate(0.5 + normal.y * 0.5) ;
+					return _SpriteTex.Sample(sampler_SpriteTex, float2(u,v))  * d;
 				}
 
 			ENDCG

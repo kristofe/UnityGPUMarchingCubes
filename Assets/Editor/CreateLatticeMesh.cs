@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class CreateLatticeMesh : MonoBehaviour {
 	// Use this for initialization
-    [MenuItem ("Mesh Creation/Create Point Lattice Mesh")]
+    [MenuItem ("Asset Creation/Create Point Lattice Mesh")]
 	static void CreatePointLatticeMesh () {
         string meshName = "LatticeMesh1x1x1";
         Mesh m = CreateLattice(32);
