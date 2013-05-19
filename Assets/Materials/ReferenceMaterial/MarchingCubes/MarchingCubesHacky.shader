@@ -123,15 +123,17 @@ Shader "Custom/GSMarchingCubes"
 						float4( halfSize, -halfSize,  halfSize, 0)		// RB  7
 					};
 
+					float4 offset = float4(0.5,0.5,0.5,0.0);//Move cube pos from 0-1 to -0.5-0.5
+					//float4 offset = float4(0.0,0.0,0.0,0.0);//Move cube pos from 0-1 to -0.5-0.5
 					const float weights[8] = {
-						SampleData(p[0].pos + cubeVerts[0]),
-						SampleData(p[0].pos + cubeVerts[1]),
-						SampleData(p[0].pos + cubeVerts[2]),
-						SampleData(p[0].pos + cubeVerts[3]),
-						SampleData(p[0].pos + cubeVerts[4]),
-						SampleData(p[0].pos + cubeVerts[5]),
-						SampleData(p[0].pos + cubeVerts[6]),
-						SampleData(p[0].pos + cubeVerts[7])
+						SampleData(p[0].pos + cubeVerts[0] + offset),
+						SampleData(p[0].pos + cubeVerts[1] + offset),
+						SampleData(p[0].pos + cubeVerts[2] + offset),
+						SampleData(p[0].pos + cubeVerts[3] + offset),
+						SampleData(p[0].pos + cubeVerts[4] + offset),
+						SampleData(p[0].pos + cubeVerts[5] + offset),
+						SampleData(p[0].pos + cubeVerts[6] + offset),
+						SampleData(p[0].pos + cubeVerts[7] + offset)
 					};
 
 					int cubeIndex = 
@@ -442,21 +444,21 @@ Shader "Custom/GSMarchingCubes"
 							int vb = edge_to_verts[vertlistIndices.x].y;
 							float amount = (_isoLevel - weights[va]) / (weights[vb] - weights[va]);
 							float4 worldPos = lerp( p[0].pos + cubeVerts[va],  p[0].pos + cubeVerts[vb], amount);
-							float4 texA = worldPos;
+							float4 texA = worldPos+offset;
 							float4 pA = mul(vp, worldPos);
 							
 							va = edge_to_verts[vertlistIndices.y].x;
 							vb = edge_to_verts[vertlistIndices.y].y;
 							amount = (_isoLevel - weights[va]) / (weights[vb] - weights[va]);
 							worldPos = lerp( p[0].pos + cubeVerts[va],  p[0].pos + cubeVerts[vb], amount);
-							float4 texB = worldPos;
+							float4 texB = worldPos+offset;
 							float4 pB = mul(vp, worldPos);
 							
 							va = edge_to_verts[vertlistIndices.z].x;
 							vb = edge_to_verts[vertlistIndices.z].y;
 							amount = (_isoLevel - weights[va]) / (weights[vb] - weights[va]);
 							worldPos = lerp( p[0].pos + cubeVerts[va],  p[0].pos + cubeVerts[vb], amount);
-							float4 texC = worldPos;
+							float4 texC = worldPos+offset;
 							float4 pC = mul(vp, worldPos);
 
 							float4 r = pA - pC;
@@ -510,6 +512,7 @@ Shader "Custom/GSMarchingCubes"
 									);
 					float3 normal = normalize(grad);
 					normal = mul(_Object2World,normal);
+					normal = normalize(normal);
 					
 					float pi = 3.14159265;
 					float3 dir = normalize(position - float3(0.5,0.5,0.5));

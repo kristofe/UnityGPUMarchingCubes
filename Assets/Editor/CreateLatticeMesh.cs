@@ -44,6 +44,7 @@ public class CreateLatticeMesh : MonoBehaviour {
         Vector3[] normals = new Vector3[vertexCount];
         List<int> triangles = new List<int>(vertexCount * 3);
         float scale = 1.0f / meshDim;
+        Vector3 offset = new Vector3(0.5f, 0.5f, 0.5f);
         for (int z = 0; z < meshDim; ++z)
         {
             for (int y = 0; y < meshDim; ++y)
@@ -51,7 +52,7 @@ public class CreateLatticeMesh : MonoBehaviour {
                 for (int x = 0; x < meshDim; ++x)
                 {
                     int idx = z * meshDim * meshDim + y * meshDim + x;
-                    vertices[idx] = new Vector3(x * scale, y * scale, z * scale);
+                    vertices[idx] = new Vector3(x * scale, y * scale, z * scale) - offset;
                     normals[idx] = Vector3.right;
                     triangles.Add(idx);
                     triangles.Add(idx);
