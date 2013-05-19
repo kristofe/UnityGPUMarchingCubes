@@ -4,8 +4,9 @@ Shader "Custom/GSMarchingCubes"
 	{
 		_SpriteTex ("Base (RGB)", 2D) = "white" {}
 		_dataFieldTex ("Data Field Texture", 3D) = "white"{}
-		//_Size ("Size", Range(0, 3)) = 0.5 
-		_isoLevel ("_isoLevel", Range(0.0, 0.5)) = 0.25
+		_dataSize ("Data Field Texture Size", float) = 64 
+		_meshSize ("Mesh Cube Size", float) = 32 
+		_isoLevel ("isoLevel", Range(0.0, 0.5)) = 0.25
 	}
 
 	SubShader 
@@ -57,6 +58,8 @@ Shader "Custom/GSMarchingCubes"
 				float4x4 _VP;
 				Texture2D _SpriteTex;
 				SamplerState sampler_SpriteTex;
+				float _dataSize;
+				float _meshSize;
 
 				// **************************************************************
 				// Shader Programs												*
@@ -67,9 +70,7 @@ Shader "Custom/GSMarchingCubes"
 				{
 					GS_INPUT output = (GS_INPUT)0;
 					
-					output.pos =  v.vertex;// * 20; //mul(_Object2World, v.vertex ); 
-					//float4x4 vp = mul(UNITY_MATRIX_MVP, _World2Object);
-					//output.pos = mul(vp, output.pos);
+					output.pos =  v.vertex;
 					output.normal = v.normal;
 					output.tex0 = float2(0, 0);
 
@@ -108,7 +109,7 @@ Shader "Custom/GSMarchingCubes"
 					};
 					*/
 
-					const float halfSize = 1.0/64.0;
+					const float halfSize = 0.5/_meshSize; 
 	 				const float4 cubeVerts[8] = {
 						//front face
 						float4(-halfSize, -halfSize, -halfSize, 0) ,		//LB   0
@@ -432,7 +433,7 @@ Shader "Custom/GSMarchingCubes"
 					
 					//int numpolys = case_to_numpolys[cubeIndex];
 				
-					float4x4 vp = mul(UNITY_MATRIX_MVP, _World2Object);
+					float4x4 vp = UNITY_MATRIX_MVP;//mul(UNITY_MATRIX_MVP, _World2Object);
 					FS_INPUT pIn;
 					for( int i = 0; i < 5; i++ ){
 						int4 vertlistIndices = edge_connect_list[cubeIndex * 5 + i];
@@ -497,7 +498,7 @@ Shader "Custom/GSMarchingCubes"
 				// Fragment Shader -----------------------------------------------
 				float4 FS_Main(FS_INPUT input) : COLOR
 				{
-					float dataStepSize = 64.0;
+					float dataStepSize = _dataSize;
 					float h2 = dataStepSize*2.0;
 					float3 position = input.tex3D;
 					float3 dataStep = float3(1.0/dataStepSize,1.0/dataStepSize,1.0/dataStepSize);
@@ -508,6 +509,7 @@ Shader "Custom/GSMarchingCubes"
 									(SampleData3(position+float3(0,0,dataStep.z)).x - SampleData3(position+float3(0,0,-dataStep.z)).x)/h2
 									);
 					float3 normal = normalize(grad);
+					normal = mul(_Object2World,normal);
 					
 					float pi = 3.14159265;
 					float3 dir = normalize(position - float3(0.5,0.5,0.5));
