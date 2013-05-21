@@ -3,14 +3,14 @@
 RWTexture3D<float4> Result;
 float4 g_Params;
  
-RWStructuredBuffer<float3> posBuffer : register(u0);
+RWStructuredBuffer<float4> posBuffer : register(u0);
 int numParticles;
 
 
 
 float getPower(float3 testPos, float4 pos){
 		//This basically plots a nice curve that is 0.25 at r=0 and 0 at r=_power * 0.707
-		float3 d = new Vector3(pos.x - testPos.x, pos.y - testPos.y, pos.z - testPos.z);
+		float3 d = float3(pos.x - testPos.x, pos.y - testPos.y, pos.z - testPos.z);
 
 		float mSqr = dot(d,d);
 		mSqr /= pos.w * pos.w;
@@ -41,21 +41,13 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 	*/
 
 
-	/*
 	float3 testPos = float3(id.x*textureSizeScale,id.y*textureSizeScale,id.z*textureSizeScale);
 
 	for(int i = 0; i < numParticles; ++i){
 		float4 particle = float4(posBuffer[i].x,posBuffer[i].y,posBuffer[i].z,	posBuffer[i].w);	
-		//p += getPower(testPos, particle);
+		p += getPower(testPos, particle);
 	}
-	float4 c;
-	c.r = (id.x & id.y & id.z) ? 1.0 : 0.0;
-	//c.r = cos((id.x * g_Params.z + g_Params.x) * 4.0) * 0.5 + 0.5;
-	c.g = sin((id.y * g_Params.z - g_Params.x) * 3.0) * 0.5 + 0.5;
-	c.b = id.z * g_Params.z;
-	c.a = 1.0;
-	Result[id] = c;
+
 	Result[id] = float4(p,p,p,1.0);
-	*/
-	Result[id] = float4(0,0,0,1.0);
+	//Result[id] = float4(0,0,0,1.0);
 }
