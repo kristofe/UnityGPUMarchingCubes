@@ -520,10 +520,10 @@ Shader "Custom/GSMarchingCubes"
 					float v = 0.5 + 0.5* dot(float3(0,1,0),dir);
 
 					float d = dot(normalize(_WorldSpaceLightPos0.xyz),normal);
-					//return float4(d,d,d,1);
+					return float4(d,d,d,1);
 					//return float4(normal,1);
 					//return _SpriteTex.Sample(sampler_SpriteTex, float2(u,v))  * saturate(0.5 + normal.y * 0.5) ;
-					return _SpriteTex.Sample(sampler_SpriteTex, float2(u,v))  * d;
+					//return _SpriteTex.Sample(sampler_SpriteTex, float2(u,v))  * d;
 				}
 
 			ENDCG

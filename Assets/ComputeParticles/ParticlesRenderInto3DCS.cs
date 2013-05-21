@@ -19,6 +19,9 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
     //private ComputeBuffer particleColorBuffer;
     private ComputeBuffer targetBuffer;
 
+
+    private uint frame;
+
 	void OnDisable ()
 	{
 		if (volume != null) DestroyImmediate (volume);
@@ -45,6 +48,7 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
 	
 	void Start ()
 	{
+        frame = 0;
          // Setup the base args buffer
         particleLocations = new Vector4[particleCount];
         //particleColors = new Vector4[particleCount];
@@ -70,13 +74,15 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
 
 		if (!volume)
 		{
-			volume = new RenderTexture (textureSize, textureSize, 0, RenderTextureFormat.ARGB32);
+			volume = new RenderTexture (textureSize, textureSize, 0, RenderTextureFormat.RFloat);
 			volume.volumeDepth = textureSize;
 			volume.isVolume = true;
 			volume.enableRandomWrite = true;
 			volume.Create();
-			renderer.material.SetTexture ("_Volume", volume);
+			//renderer.material.SetTexture ("_Volume", volume);
+            renderer.material.SetTexture("_dataFieldTex", volume);
 		}
+        
 
 	}
 
@@ -89,22 +95,21 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
          float T = Time.timeSinceLevelLoad;
 
 
-        updateParticlePositionsCS.SetFloat("Time", T);
-        updateParticlePositionsCS.SetVector("CoreLoc", Vector3.zero);
+         updateParticlePositionsCS.SetFloat("Time", T);
+         updateParticlePositionsCS.SetVector("CoreLoc", Vector3.zero);
 
-        //cs.SetBuffer(cs.FindKernel("CSMain"), "colBuffer", particleColorBuffer);
-        updateParticlePositionsCS.SetBuffer(updateTexture3DCS.FindKernel("CSMain"), "posBuffer", particleBuffer);
-        updateParticlePositionsCS.SetBuffer(updateTexture3DCS.FindKernel("CSMain"), "tarBuffer", targetBuffer);
-        updateParticlePositionsCS.Dispatch(updateParticlePositionsCS.FindKernel("CSMain"), particleCount, 1, 1);
+         //cs.SetBuffer(cs.FindKernel("CSMain"), "colBuffer", particleColorBuffer);
+         updateParticlePositionsCS.SetBuffer(updateTexture3DCS.FindKernel("CSMain"), "posBuffer", particleBuffer);
+         updateParticlePositionsCS.SetBuffer(updateTexture3DCS.FindKernel("CSMain"), "tarBuffer", targetBuffer);
+         updateParticlePositionsCS.Dispatch(updateParticlePositionsCS.FindKernel("CSMain"), particleCount, 1, 1);
+
+         //Render Volume Texture
+         updateTexture3DCS.SetVector("g_Params", new Vector4(Time.timeSinceLevelLoad, textureSize, 1.0f / textureSize, 1.0f));
+         updateTexture3DCS.SetInt("numParticles", particleCount);
+         updateTexture3DCS.SetBuffer(updateTexture3DCS.FindKernel("CSMain"), "posBuffer", particleBuffer);
+         //updateTexture3DCS.SetTexture(0, "Result", volume);
+         updateTexture3DCS.Dispatch(0, textureSize, textureSize, textureSize);
 
 
-		updateTexture3DCS.SetVector ("g_Params", new Vector4(Time.timeSinceLevelLoad, textureSize, 1.0f/textureSize, 1.0f));
-		
-      
-        //Render Volume Texture
-        updateTexture3DCS.SetInt("numParticles", particleCount);
-        updateTexture3DCS.SetBuffer(updateTexture3DCS.FindKernel("CSMain"), "posBuffer", particleBuffer);
-		updateTexture3DCS.SetTexture (0, "Result", volume);
-		updateTexture3DCS.Dispatch (0, textureSize,textureSize,textureSize);
 	}
 }
