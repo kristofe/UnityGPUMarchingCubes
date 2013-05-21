@@ -3,9 +3,9 @@
 #pragma kernel CSMain
  
  
-RWStructuredBuffer<float3> posBuffer : register(u0);
-RWStructuredBuffer<float3> colBuffer : register(u1);
-RWStructuredBuffer<float3> tarBuffer : register(u2);
+RWStructuredBuffer<float4> posBuffer : register(u0);
+RWStructuredBuffer<float4> colBuffer : register(u1);
+//RWStructuredBuffer<float3> tarBuffer : register(u2);
  
 float Time;
 float4 CoreLoc;
@@ -44,7 +44,7 @@ float3 ranWithinSphere(float2 seed)
         return temp;
 }
  
-float distance(float3 point1, float3 point2)
+float distance(float4 point1, float4 point2)
 {
         float x = (point1.x - point2.x) * (point1.x - point2.x);
         float y = (point1.y - point2.y) * (point1.x - point2.y);
@@ -59,8 +59,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         float2 seed = float2(id.x * Time, Time);
        
  
-        colBuffer[id.x].x = cos(Time) * sin(Time);
-        colBuffer[id.x].y = sin(Time);
+        //colBuffer[id.x].x = cos(Time) * sin(Time);
+        //colBuffer[id.x].y = sin(Time);
        
         tarBuffer[id.x].x = CoreLoc.x + ((cos(Time * id.x) * sin(Time))) * 4;
         tarBuffer[id.x].y = CoreLoc.y + ((sin(Time * id.x) * cos(Time))) * 7;
