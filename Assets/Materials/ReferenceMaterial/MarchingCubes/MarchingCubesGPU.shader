@@ -13,7 +13,7 @@ Shader "Custom/GSMarchingCubes"
 	{
 		Pass
 		{
-			Cull Back
+			Cull Off
 			Tags { "RenderType"="Opaque" }
 			LOD 200
 		

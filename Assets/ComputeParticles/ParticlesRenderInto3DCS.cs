@@ -72,16 +72,13 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
         particleBuffer = new ComputeBuffer(particleCount, 16);
         particleBuffer.SetData(particleLocations);
 
-		if (!volume)
-		{
-			volume = new RenderTexture (textureSize, textureSize, 0, RenderTextureFormat.RFloat);
-			volume.volumeDepth = textureSize;
-			volume.isVolume = true;
-			volume.enableRandomWrite = true;
-			volume.Create();
-			//renderer.material.SetTexture ("_Volume", volume);
-            renderer.material.SetTexture("_dataFieldTex", volume);
-		}
+        volume = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.Default);
+        volume.volumeDepth = textureSize;
+        volume.isVolume = true;
+        volume.enableRandomWrite = true;
+        volume.Create();
+        renderer.material.SetTexture ("_Volume", volume);
+        renderer.material.SetTexture("_dataFieldTex", volume);
         
 
 	}
@@ -107,7 +104,7 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
          updateTexture3DCS.SetVector("g_Params", new Vector4(Time.timeSinceLevelLoad, textureSize, 1.0f / textureSize, 1.0f));
          updateTexture3DCS.SetInt("numParticles", particleCount);
          updateTexture3DCS.SetBuffer(updateTexture3DCS.FindKernel("CSMain"), "posBuffer", particleBuffer);
-         //updateTexture3DCS.SetTexture(0, "Result", volume);
+         updateTexture3DCS.SetTexture(0, "Result", volume);
          updateTexture3DCS.Dispatch(0, textureSize, textureSize, textureSize);
 
 

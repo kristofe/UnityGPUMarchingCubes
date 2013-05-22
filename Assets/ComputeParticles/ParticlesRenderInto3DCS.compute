@@ -1,6 +1,6 @@
 #pragma kernel CSMain
 
-RWTexture3D<float> Result;
+RWTexture3D<float4> Result;
 float4 g_Params;
  
 RWStructuredBuffer<float4> posBuffer : register(u0);
@@ -39,6 +39,6 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 		p += getPower(testPos, particle);
 	}
 
-	Result[id] = p;
-	//Result[id] = float4(0,0,0,1.0);
+	//Result[id] = p;
+	Result[id] = float4(p,p,p,1.0);
 }
