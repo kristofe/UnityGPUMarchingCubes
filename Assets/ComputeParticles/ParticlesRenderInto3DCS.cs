@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class ParticlesRenderInto3DCS : MonoBehaviour
 {
+    public Material marchingCubesMaterial;
 	public ComputeShader updateTexture3DCS;
 	public ComputeShader updateParticlePositionsCS;
 	public int textureSize = 16;
@@ -103,8 +104,8 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
 
         //renderer.material.SetTexture ("_Volume", tex3D);
         //renderer.material.SetTexture ("_Volume", volume);
-        renderer.material.SetTexture("_dataFieldTex", tex3D);
-        
+        //renderer.material.SetTexture("_dataFieldTex", tex3D);
+        marchingCubesMaterial.SetTexture("_dataFieldTex", tex3D);
         
 
 	}
