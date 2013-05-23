@@ -75,7 +75,7 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
 
         tex3D = new Texture3D( textureSize, textureSize, textureSize, TextureFormat.ARGB32);
 
-        volume = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.Default);
+        volume = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGB32);
         volume.volumeDepth = textureSize;
         volume.isVolume = true;
         volume.enableRandomWrite = true;
