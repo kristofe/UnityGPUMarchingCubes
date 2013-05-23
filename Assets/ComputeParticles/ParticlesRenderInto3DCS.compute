@@ -1,9 +1,9 @@
 #pragma kernel CSMain
 
-RWTexture3D<float4> Result;
+RWTexture3D<float4> Result : register(u0);
 float4 g_Params;
  
-RWStructuredBuffer<float4> posBuffer : register(u0);
+RWStructuredBuffer<float4> posBuffer : register(u1);
 int numParticles;
 
 
