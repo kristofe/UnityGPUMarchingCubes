@@ -6,6 +6,7 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
 	public ComputeShader updateParticlePositionsCS;
 	public int textureSize = 16;
 	private RenderTexture volume;
+        private Texture3D tex3D;  // texture to pass to geometry shader
 
     public int particleCount = 1000;
     public float particlePower = 0.2f;
@@ -72,13 +73,16 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
         particleBuffer = new ComputeBuffer(particleCount, 16);
         particleBuffer.SetData(particleLocations);
 
+        tex3D = new Texture3D( textureSize, textureSize, textureSize, TextureFormat.ARGB32);
+
         volume = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.Default);
         volume.volumeDepth = textureSize;
         volume.isVolume = true;
         volume.enableRandomWrite = true;
         volume.Create();
         renderer.material.SetTexture ("_Volume", volume);
-        renderer.material.SetTexture("_dataFieldTex", volume);
+        renderer.material.SetTexture("_dataFieldTex", tex3D);
+        
         
 
 	}
@@ -99,6 +103,14 @@ public class ParticlesRenderInto3DCS : MonoBehaviour
          updateParticlePositionsCS.SetBuffer(updateTexture3DCS.FindKernel("CSMain"), "posBuffer", particleBuffer);
          updateParticlePositionsCS.SetBuffer(updateTexture3DCS.FindKernel("CSMain"), "tarBuffer", targetBuffer);
          updateParticlePositionsCS.Dispatch(updateParticlePositionsCS.FindKernel("CSMain"), particleCount, 1, 1);
+
+
+         
+         //get pixels from render texture and copy to texture3D
+         updateParticlePositionsCS.GetData(?????);
+         Color[] cols = volume.GetPixels();
+         tex3D.SetPixels(cols);
+         tex3D.Apply();
 
          //Render Volume Texture
          updateTexture3DCS.SetVector("g_Params", new Vector4(Time.timeSinceLevelLoad, textureSize, 1.0f / textureSize, 1.0f));
