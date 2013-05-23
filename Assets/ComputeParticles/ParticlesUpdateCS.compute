@@ -4,8 +4,8 @@
  
  
 RWStructuredBuffer<float4> posBuffer : register(u0);
-//RWStructuredBuffer<float4> colBuffer : register(u1);
-RWStructuredBuffer<float3> tarBuffer : register(u2);
+//RWStructuredBuffer<float4> colBuffer : register(u2);
+RWStructuredBuffer<float3> tarBuffer : register(u1);
  
 float Time;
 float4 CoreLoc;

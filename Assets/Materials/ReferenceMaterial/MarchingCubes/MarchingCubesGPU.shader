@@ -505,7 +505,7 @@ Shader "Custom/GSMarchingCubes"
 					float3 position = input.tex3D;
 					float3 dataStep = float3(1.0/dataStepSize,1.0/dataStepSize,1.0/dataStepSize);
 
-					float3 grad = -float3(
+					float3 grad = float3(
 									(SampleData3(position + float3(dataStep.x, 0, 0)).x - SampleData3(position+float3(-dataStep.x, 0, 0)).x)/h2, 
 									(SampleData3(position+float3(0, dataStep.y, 0)).x - SampleData3(position+float3(0, -dataStep.y, 0)).x)/h2, 
 									(SampleData3(position+float3(0,0,dataStep.z)).x - SampleData3(position+float3(0,0,-dataStep.z)).x)/h2
@@ -519,7 +519,7 @@ Shader "Custom/GSMarchingCubes"
 					float u = (atan2(dir.z,dir.x)+pi)/(2.0 * pi); 
 					float v = 0.5 + 0.5* dot(float3(0,1,0),dir);
 
-					float d = dot(normalize(_WorldSpaceLightPos0.xyz),normal);
+					float d = abs(dot(normalize(_WorldSpaceLightPos0.xyz),-normal));
 					return float4(d,d,d,1);
 					//return float4(normal,1);
 					//return _SpriteTex.Sample(sampler_SpriteTex, float2(u,v))  * saturate(0.5 + normal.y * 0.5) ;

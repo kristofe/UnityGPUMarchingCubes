@@ -1,9 +1,10 @@
 #pragma kernel CSMain
 
-RWTexture3D<float4> Result : register(u0);
+//RWTexture3D<float4> pixels;
+RWStructuredBuffer<float4> pixels : register(u1);
+RWStructuredBuffer<float4> posBuffer : register(u0);
+
 float4 g_Params;
- 
-RWStructuredBuffer<float4> posBuffer : register(u1);
 int numParticles;
 
 
@@ -31,6 +32,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 {
 	float p = 0.0;
 	float textureSizeScale = g_Params.z;
+	int idx = id.x + (id.y * g_Params.y) + (id.z * g_Params.y * g_Params.y);
 
 	float3 testPos = float3(id.x*textureSizeScale,id.y*textureSizeScale,id.z*textureSizeScale);
 
@@ -40,5 +42,5 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 	}
 
 	//Result[id] = p;
-	Result[id] = float4(p,p,p,1.0);
+	pixels[idx] = float4(p,p,p,1.0);
 }
