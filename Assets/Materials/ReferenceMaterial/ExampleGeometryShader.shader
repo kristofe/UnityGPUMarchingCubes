@@ -1,3 +1,6 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
+
 Shader "Custom/GeomShader-PassThrough" {
 	Properties 
 	{
@@ -60,7 +63,7 @@ Shader "Custom/GeomShader-PassThrough" {
 				{
 					GS_INPUT output = (GS_INPUT)0;
 
-					output.pos =  mul(_Object2World, v.vertex);
+					output.pos =  mul(unity_ObjectToWorld, v.vertex);
 					output.normal = v.normal;
 					output.tex0 = v.texcoord;
 
@@ -73,7 +76,7 @@ Shader "Custom/GeomShader-PassThrough" {
 				[maxvertexcount(3)]
 				void GS_Main(triangle GS_INPUT p[3], inout TriangleStream<FS_INPUT> triStream)
 				{
-					float4x4 vp = mul(UNITY_MATRIX_MVP, _World2Object);
+					float4x4 vp = mul(UNITY_MATRIX_MVP, unity_WorldToObject);
 					FS_INPUT pIn;
 					for(uint i= 0; i < 3; i++){
 						pIn.pos = mul(vp,p[i].pos);

@@ -21,7 +21,8 @@ public class LatticeRenderInto3DCS : MonoBehaviour
 			volume.isVolume = true;
 			volume.enableRandomWrite = true;
 			volume.Create();
-			renderer.material.SetTexture ("_Volume", volume);
+			Renderer Rend = GetComponent<Renderer>().GetComponent<Renderer>();
+			Rend.material.SetTexture ("_Volume", volume);
 		}
 	}
 	

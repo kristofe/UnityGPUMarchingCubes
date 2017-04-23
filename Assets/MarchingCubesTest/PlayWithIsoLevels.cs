@@ -9,10 +9,11 @@ public class PlayWithIsoLevels : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-        float level = Mathf.Sin(Time.time) * 0.5f + 0.5f;
-        level =  0.05f + level * 0.25f;
-        renderer.material.SetFloat("_isoLevel", level);
-	
+	void Update () 
+	{
+		 float level = Mathf.Sin(Time.time) * 0.5f + 0.5f;
+		 level =  0.05f + level * 0.25f;
+		Renderer Rend = GetComponent<Renderer>().GetComponent<Renderer>();
+		Rend.material.SetFloat("_isoLevel", level);
 	}
 }

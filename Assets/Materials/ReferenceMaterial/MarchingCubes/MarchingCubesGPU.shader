@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
 Shader "Custom/GSMarchingCubes" 
 {
   Properties 
@@ -511,7 +513,7 @@ Shader "Custom/GSMarchingCubes"
 									(SampleData3(position+float3(0,0,dataStep.z)).x - SampleData3(position+float3(0,0,-dataStep.z)).x)/h2
 									);
 					float3 normal = normalize(grad);
-					normal = mul(_Object2World,normal);
+					normal = mul(unity_ObjectToWorld,normal);
 					normal = normalize(normal);
 					
 					float pi = 3.14159265;

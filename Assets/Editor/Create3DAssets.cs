@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 
 public class Create3DAssets : MonoBehaviour {
 	public Texture3D texture3D;
@@ -14,20 +13,22 @@ public class Create3DAssets : MonoBehaviour {
 	private Mesh m;
 	
 	// Use this for initialization
-	public void Start () {
-        /*if (onlyGenerateTexture3D)
-        {
-            Generate3DTexture();
-            save3DTexture();
-        }
-        */
-        CreateMesh();
+	public void Start () 
+	{
+		/*if (onlyGenerateTexture3D)
+		{
+			Generate3DTexture();
+			save3DTexture();
+		}
+		*/
+
+		CreateMesh();
 		//Generate3DTexture();
 		
-		Vector4 localEyePos = transform.worldToLocalMatrix.MultiplyPoint(
-                                 Camera.main.transform.position);
-		Vector4 localLightPos = transform.worldToLocalMatrix.MultiplyPoint(
-                                 _light.transform.position);
+		Vector4 localEyePos = transform.worldToLocalMatrix.MultiplyPoint(Camera.main.transform.position);
+		Vector4 localLightPos = transform.worldToLocalMatrix.MultiplyPoint(_light.transform.position);
+
+		Renderer renderer = GetComponent<Renderer>().GetComponent<Renderer>();
 		renderer.material.SetVector("g_eyePos", localEyePos);
 		renderer.material.SetVector("g_lightPos", localLightPos);
 		renderer.material.SetFloat("g_lightIntensity", _light.intensity);
@@ -36,10 +37,12 @@ public class Create3DAssets : MonoBehaviour {
 	
 	void LateUpdate()
 	{
-        //if (onlyGenerateTexture3D)
-        //    return;
-		Vector4 localEyePos = transform.worldToLocalMatrix.MultiplyPoint(
-                              Camera.main.transform.position);
+		//if (onlyGenerateTexture3D)
+		//return;
+
+		Renderer renderer = GetComponent<Renderer>().GetComponent<Renderer>();
+
+		Vector4 localEyePos = transform.worldToLocalMatrix.MultiplyPoint(Camera.main.transform.position);
 		localEyePos += new Vector4(0.5f,0.5f,0.5f,0.0f);
 		renderer.material.SetVector("g_eyePos", localEyePos);
 		
@@ -284,6 +287,8 @@ public class Create3DAssets : MonoBehaviour {
 		
 		texture2D.SetPixels(cols);
 		texture2D.Apply();
+
+		Renderer renderer = GetComponent<Renderer>().GetComponent<Renderer>();
 		renderer.material.SetTexture("g_tex", texture2D);
 				 
 		//Color[] cs = texture3D.GetPixels();
@@ -330,6 +335,7 @@ public class Create3DAssets : MonoBehaviour {
 		//	Debug.Log (newC[i]);
 		texture3D.SetPixels(cols);
 		texture3D.Apply();
+		Renderer renderer = GetComponent<Renderer>().GetComponent<Renderer>();
 		renderer.material.SetTexture("g_densityTex", texture3D);
 		texture3D.filterMode = FilterMode.Trilinear;
 		texture3D.wrapMode = TextureWrapMode.Clamp;
